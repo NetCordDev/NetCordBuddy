@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-using NetCord;
-using NetCord.Gateway;
+﻿using NetCord;
 using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 
@@ -9,22 +6,38 @@ using NetCordBuddy.Docs;
 
 namespace NetCordBuddy.Handlers.InteractionHandlerModules.SlashCommands;
 
-public class DocsCommand : ApplicationCommandModule<ExtendedSlashCommandContext>
+public class DocsCommand : ApplicationCommandModule<SlashCommandContext>
 {
+    public DocsCommand(DocsService docsService, ConfigService config)
+    {
+        _docsService = docsService;
+        _config = config;
+    }
+
+    private readonly DocsService _docsService;
+    private readonly ConfigService _config;
+
     [SlashCommand("docs", "Allows you to search the documentation via Discord")]
     public Task DocsAsync([SlashCommandParameter(Description = "Search query", MaxLength = 90, AutocompleteProviderType = typeof(QueryAutocompleteProvider))] string query)
     {
-        return RespondAsync(InteractionCallback.ChannelMessageWithSource(DocsHelper.CreateDocsEmbed(query, 0, Context, Context.Interaction.Id, Context.User)));
+        var config = _config;
+        return RespondAsync(InteractionCallback.ChannelMessageWithSource(new InteractionMessageProperties().AddEmbeds(DocsHelper.CreateDocsEmbed(query, 0, _docsService, config, Context.Interaction.Id, Context.User, out var more))
+                                                                                                           .WithComponents(DocsHelper.CreateDocsComponents(query, 0, more, config))));
     }
 
-    private class QueryAutocompleteProvider : IAutocompleteProvider<ExtendedAutocompleteInteractionContext>
+    private class QueryAutocompleteProvider : IAutocompleteProvider<AutocompleteInteractionContext>
     {
-        public Task<IEnumerable<ApplicationCommandOptionChoiceProperties>?> GetChoicesAsync(ApplicationCommandInteractionDataOption option, ExtendedAutocompleteInteractionContext context)
+        public QueryAutocompleteProvider(DocsService docsService)
         {
-            var service = context.Provider.GetRequiredService<DocsService>();
+            _docsService = docsService;
+        }
 
+        private readonly DocsService _docsService;
+
+        public Task<IEnumerable<ApplicationCommandOptionChoiceProperties>?> GetChoicesAsync(ApplicationCommandInteractionDataOption option, AutocompleteInteractionContext context)
+        {
             var query = option.Value!;
-            return Task.FromResult<IEnumerable<ApplicationCommandOptionChoiceProperties>?>(service.FindSymbols(query, 0, 25, out _).Select(s =>
+            return Task.FromResult<IEnumerable<ApplicationCommandOptionChoiceProperties>?>(_docsService.FindSymbols(query, 0, 25, out _).Select(s =>
             {
                 var name = s.Name;
                 if (name.Length > 90)

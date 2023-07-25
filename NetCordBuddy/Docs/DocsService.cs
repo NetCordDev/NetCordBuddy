@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace NetCordBuddy.Docs;
 
-internal class DocsService
+public class DocsService
 {
     public DocsService(ILogger<DocsService> logger, ConfigService config, HttpClient httpClient)
     {
@@ -97,7 +97,7 @@ internal class DocsService
                     if (symbol is INamespaceOrTypeSymbol namespaceOrType)
                     {
                         if (namespaceOrType is ITypeSymbol)
-                            symbols.Add(new(id, parentId, docsUrl));
+                            symbols.Add(new(id, null, docsUrl));
 
                         foreach (var child in namespaceOrType.GetMembers())
                             Add(child, id);

@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-using NetCord;
+﻿using NetCord;
 using NetCord.Rest;
 
 using NetCordBuddy.Docs;
@@ -9,16 +7,15 @@ namespace NetCordBuddy.Handlers.InteractionHandlerModules;
 
 internal static class DocsHelper
 {
-    public static InteractionMessageProperties CreateDocsEmbed<TContext>(string query, int page, TContext context, ulong interactionId, User interactionUser) where TContext : IExtendedContext
+    public static EmbedProperties CreateDocsEmbed(string query, int page, DocsService docsService, ConfigService config, ulong interactionId, User interactionUser, out bool more)
     {
-        var service = context.Provider.GetRequiredService<DocsService>();
-        var results = service.FindSymbols(query, page * 5, 5, out var more);
+        var results = docsService.FindSymbols(query, page * 5, 5, out more);
 
         if (results.Count == 0)
             throw new("No results found!");
 
         var embedTitle = "Results";
-        var footerText = $"{interactionUser.Username}#{interactionUser.Discriminator:D4}";
+        var footerText = interactionUser.Username;
 
         int length = embedTitle.Length + footerText.Length;
 
@@ -32,36 +29,33 @@ internal static class DocsHelper
 
         return new()
         {
-            Embeds = new EmbedProperties[]
+            Title = embedTitle,
+            Footer = new()
             {
-                new()
+                Text = footerText,
+                IconUrl = (interactionUser.HasAvatar ? interactionUser.GetAvatarUrl() : interactionUser.DefaultAvatarUrl).ToString(),
+            },
+            Fields = embedFields,
+            Timestamp = SnowflakeUtils.CreatedAt(interactionId),
+            Color = config.PrimaryColor,
+        };
+    }
+
+    public static IEnumerable<ComponentProperties> CreateDocsComponents(string query, int page, bool more, ConfigService config)
+    {
+        return new ComponentProperties[]
+        {
+            new ActionRowProperties(new ButtonProperties[]
+            {
+                new ActionButtonProperties($"docs:{page - 1}:{query}", new EmojiProperties(config.Emojis.Left), ButtonStyle.Primary)
                 {
-                    Title = embedTitle,
-                    Footer = new()
-                    {
-                        Text = footerText,
-                        IconUrl = (interactionUser.HasAvatar ? interactionUser.GetAvatarUrl() : interactionUser.DefaultAvatarUrl).ToString(),
-                    },
-                    Fields = embedFields,
-                    Timestamp = SnowflakeUtils.CreatedAt(interactionId),
-                    Color = context.Config.PrimaryColor,
+                    Disabled = page < 1,
                 },
-            },
-            Components = new ComponentProperties[]
-            {
-                new ActionRowProperties(new ButtonProperties[]
+                new ActionButtonProperties($"docs:{page + 1}:{query}", new EmojiProperties(config.Emojis.Right), ButtonStyle.Primary)
                 {
-                    new ActionButtonProperties($"docs:{page - 1}:{query}", new EmojiProperties(context.Config.Emojis.Left), ButtonStyle.Primary)
-                    {
-                        Disabled = page < 1,
-                    },
-                    new ActionButtonProperties($"docs:{page + 1}:{query}", new EmojiProperties(context.Config.Emojis.Right), ButtonStyle.Primary)
-                    {
-                        Disabled = !more,
-                    },
-                }),
-            },
-            Flags = 0,
+                    Disabled = !more,
+                },
+            }),
         };
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 using NetCord;
 using NetCord.Gateway;
+using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 using NetCord.Services.Interactions;
 
@@ -14,8 +15,8 @@ namespace NetCordBuddy.Handlers;
 
 internal class InteractionHandler : BaseHandler
 {
-    private readonly ApplicationCommandService<ExtendedSlashCommandContext, ExtendedAutocompleteInteractionContext> _slashCommandService;
-    private readonly InteractionService<ExtendedButtonInteractionContext> _buttonInteractionService;
+    private readonly ApplicationCommandService<SlashCommandContext, AutocompleteInteractionContext> _slashCommandService;
+    private readonly InteractionService<ButtonInteractionContext> _buttonInteractionService;
 
     public InteractionHandler(GatewayClient client, ILogger<InteractionHandler> logger, ConfigService config, IServiceProvider provider) : base(client, logger, config, provider)
     {
@@ -50,9 +51,9 @@ internal class InteractionHandler : BaseHandler
         {
             await (interaction switch
             {
-                SlashCommandInteraction slashCommandInteraction => _slashCommandService.ExecuteAsync(new(slashCommandInteraction, Client, Config, Provider)),
-                ApplicationCommandAutocompleteInteraction autocompleteInteraction => _slashCommandService.ExecuteAutocompleteAsync(new(autocompleteInteraction, Client, Config, Provider)),
-                ButtonInteraction buttonInteraction => _buttonInteractionService.ExecuteAsync(new(buttonInteraction, Client, Config, Provider)),
+                SlashCommandInteraction slashCommandInteraction => _slashCommandService.ExecuteAsync(new(slashCommandInteraction, Client), Provider),
+                ApplicationCommandAutocompleteInteraction autocompleteInteraction => _slashCommandService.ExecuteAutocompleteAsync(new(autocompleteInteraction, Client), Provider),
+                ButtonInteraction buttonInteraction => _buttonInteractionService.ExecuteAsync(new(buttonInteraction, Client), Provider),
                 _ => throw new("Invalid interaction!"),
             });
         }
