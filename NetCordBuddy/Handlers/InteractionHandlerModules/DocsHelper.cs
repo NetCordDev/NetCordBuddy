@@ -7,7 +7,7 @@ namespace NetCordBuddy.Handlers.InteractionHandlerModules;
 
 internal static class DocsHelper
 {
-    public static EmbedProperties CreateDocsEmbed(string query, int page, DocsService docsService, ConfigService config, ulong interactionId, User interactionUser, out bool more)
+    public static EmbedProperties CreateDocsEmbed(string query, int page, DocsService docsService, Configuration config, ulong interactionId, User interactionUser, out bool more)
     {
         var results = docsService.FindSymbols(query, page * 5, 5, out more);
 
@@ -22,10 +22,10 @@ internal static class DocsHelper
         var embedFields = results
             .Select(s => new EmbedFieldProperties()
             {
-                Description = $"```cs\n{s.Name}```[Docs]({s.DocsUrl})",
+                Value = $"```cs\n{s.Name}```[Docs]({s.DocsUrl})",
             })
-            .Where(f => f.Description.Length <= 1024)
-            .TakeWhile(f => (length += f.Description.Length) <= 6000);
+            .Where(f => f.Value!.Length <= 1024)
+            .TakeWhile(f => (length += f.Value!.Length) <= 6000);
 
         return new()
         {
@@ -36,26 +36,26 @@ internal static class DocsHelper
                 IconUrl = (interactionUser.HasAvatar ? interactionUser.GetAvatarUrl() : interactionUser.DefaultAvatarUrl).ToString(),
             },
             Fields = embedFields,
-            Timestamp = SnowflakeUtils.CreatedAt(interactionId),
-            Color = config.PrimaryColor,
+            Timestamp = Snowflake.CreatedAt(interactionId),
+            Color = new(config.PrimaryColor),
         };
     }
 
-    public static IEnumerable<ComponentProperties> CreateDocsComponents(string query, int page, bool more, ConfigService config)
+    public static IEnumerable<MessageComponentProperties> CreateDocsComponents(string query, int page, bool more, Configuration config)
     {
-        return new ComponentProperties[]
-        {
-            new ActionRowProperties(new ButtonProperties[]
-            {
-                new ActionButtonProperties($"docs:{page - 1}:{query}", new EmojiProperties(config.Emojis.Left), ButtonStyle.Primary)
+        return
+        [
+            new ActionRowProperties(
+            [
+                new ButtonProperties($"docs:{page - 1}:{query}", new EmojiProperties(config.Emojis.Left), ButtonStyle.Primary)
                 {
                     Disabled = page < 1,
                 },
-                new ActionButtonProperties($"docs:{page + 1}:{query}", new EmojiProperties(config.Emojis.Right), ButtonStyle.Primary)
+                new ButtonProperties($"docs:{page + 1}:{query}", new EmojiProperties(config.Emojis.Right), ButtonStyle.Primary)
                 {
                     Disabled = !more,
                 },
-            }),
-        };
+            ]),
+        ];
     }
 }

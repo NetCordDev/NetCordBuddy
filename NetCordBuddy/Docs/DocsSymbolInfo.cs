@@ -2,18 +2,12 @@
 
 namespace NetCordBuddy.Docs;
 
-public partial class DocsSymbolInfo
+public partial class DocsSymbolInfo(string id, string? parentId, string docsUrl)
 {
-    public DocsSymbolInfo(string id, string? parentId, string docsUrl)
-    {
-        Name = id;
-        DocsUrl = parentId == null ? $"{docsUrl}/{id.Replace('`', '-')}.html" : $"{docsUrl}/{parentId.Replace('`', '-')}.html#{GetFragmentRegex().Replace(id, "_")}";
-    }
-
     [GeneratedRegex(@"\W")]
     private static partial Regex GetFragmentRegex();
 
-    public string Name { get; }
+    public string Name { get; } = id;
 
-    public string DocsUrl { get; }
+    public string DocsUrl { get; } = parentId is null ? $"{docsUrl}/{id.Replace('`', '-')}.html" : $"{docsUrl}/{parentId.Replace('`', '-')}.html#{GetFragmentRegex().Replace(id, "_")}";
 }
