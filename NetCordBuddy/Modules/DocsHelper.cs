@@ -3,7 +3,7 @@ using NetCord.Rest;
 
 using NetCordBuddy.Docs;
 
-namespace NetCordBuddy.Handlers.InteractionHandlerModules;
+namespace NetCordBuddy.Modules;
 
 internal static class DocsHelper
 {

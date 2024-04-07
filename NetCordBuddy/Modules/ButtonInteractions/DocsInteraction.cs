@@ -6,7 +6,7 @@ using NetCord.Services.ComponentInteractions;
 
 using NetCordBuddy.Docs;
 
-namespace NetCordBuddy.Handlers.InteractionHandlerModules.ButtonInteractions;
+namespace NetCordBuddy.Modules.ButtonInteractions;
 
 public class DocsInteraction(DocsService docsService, IOptions<Configuration> options) : ComponentInteractionModule<ButtonInteractionContext>
 {

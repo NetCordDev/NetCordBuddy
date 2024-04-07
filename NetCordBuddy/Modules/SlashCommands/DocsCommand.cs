@@ -6,7 +6,7 @@ using NetCord.Services.ApplicationCommands;
 
 using NetCordBuddy.Docs;
 
-namespace NetCordBuddy.Handlers.InteractionHandlerModules.SlashCommands;
+namespace NetCordBuddy.Modules.SlashCommands;
 
 public class DocsCommand(DocsService docsService, IOptions<Configuration> options) : ApplicationCommandModule<SlashCommandContext>
 {
