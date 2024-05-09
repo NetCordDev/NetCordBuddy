@@ -12,10 +12,10 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-    <PackageReference Include="NetCord" Version="1.0.0-alpha.280" />
-    <PackageReference Include="NetCord.Hosting" Version="1.0.0-alpha.50" />
-    <PackageReference Include="NetCord.Hosting.Services" Version="1.0.0-alpha.59" />
-    <PackageReference Include="NetCord.Services" Version="1.0.0-alpha.181" />
+    <PackageReference Include="NetCord" Version="1.0.0-alpha.292" />
+    <PackageReference Include="NetCord.Hosting" Version="1.0.0-alpha.62" />
+    <PackageReference Include="NetCord.Hosting.Services" Version="1.0.0-alpha.71" />
+    <PackageReference Include="NetCord.Services" Version="1.0.0-alpha.193" />
   </ItemGroup>
 
   <ItemGroup>

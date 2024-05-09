@@ -10,7 +10,7 @@ namespace NetCordBuddy.Modules.SlashCommands;
 
 public class DocsCommand(DocsService docsService, IOptions<Configuration> options) : ApplicationCommandModule<SlashCommandContext>
 {
-    [SlashCommand("docs", "Allows you to search the documentation via Discord")]
+    [SlashCommand("docs", "Allows you to search the documentation via Discord", IntegrationTypes = [ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall])]
     public InteractionMessageProperties Docs([SlashCommandParameter(Description = "Search query", MaxLength = 90, AutocompleteProviderType = typeof(QueryAutocompleteProvider))] string query)
     {
         var config = options.Value;

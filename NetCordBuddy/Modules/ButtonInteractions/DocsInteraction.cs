@@ -13,9 +13,9 @@ public class DocsInteraction(DocsService docsService, IOptions<Configuration> op
     [ComponentInteraction("docs")]
     public InteractionCallback Docs(int page, string query)
     {
-        var interaction = Context.Message.Interaction!;
+        var interactionMetadata = Context.Message.InteractionMetadata!;
         var config = options.Value;
-        return InteractionCallback.ModifyMessage(m => m.AddEmbeds(DocsHelper.CreateDocsEmbed(query, page, docsService, config, interaction.Id, interaction.User, out var more))
+        return InteractionCallback.ModifyMessage(m => m.AddEmbeds(DocsHelper.CreateDocsEmbed(query, page, docsService, config, interactionMetadata.Id, interactionMetadata.User, out var more))
                                                        .WithComponents(DocsHelper.CreateDocsComponents(query, page, more, config)));
     }
 }
