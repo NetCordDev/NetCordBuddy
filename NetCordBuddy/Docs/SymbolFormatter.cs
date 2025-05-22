@@ -109,7 +109,7 @@ internal static partial class SymbolFormatter
         }
         catch (InvalidOperationException)
         {
-            return ImmutableArray<SymbolDisplayPart>.Empty;
+            return [];
         }
 
         static ImmutableArray<SymbolDisplayPart> GetCastOperatorOverloadDisplayParts(ImmutableArray<SymbolDisplayPart> parts)
@@ -122,7 +122,7 @@ internal static partial class SymbolFormatter
                 if (part.Kind is SymbolDisplayPartKind.Keyword && part.ToString() is "operator" or "checked")
                     break;
             }
-            return parts.Take(endIndex + 1).ToImmutableArray();
+            return [.. parts.Take(endIndex + 1)];
         }
     }
 

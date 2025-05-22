@@ -1,35 +1,31 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using NetCord;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Services;
 using NetCord.Hosting.Services.ApplicationCommands;
 using NetCord.Hosting.Services.ComponentInteractions;
-using NetCord.Services.ApplicationCommands;
-using NetCord.Services.ComponentInteractions;
 
 using NetCordBuddy;
 using NetCordBuddy.Docs;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services
+var services = builder.Services;
+
+services
     .AddOptions<Configuration>()
     .BindConfiguration(string.Empty)
     .ValidateOnStart()
     .ValidateDataAnnotations();
 
-builder.Services
+services
     .ConfigureHttpClientDefaults(b => b.RemoveAllLoggers())
     .AddSingleton<DocsService>()
     .AddHostedService(services => services.GetRequiredService<DocsService>())
-    .AddApplicationCommands<SlashCommandInteraction, SlashCommandContext, AutocompleteInteractionContext>()
-    .AddComponentInteractions<ButtonInteraction, ButtonInteractionContext>()
-    .AddDiscordGateway(options => options.Configuration = new()
-    {
-        Intents = 0,
-    });
+    .AddApplicationCommands()
+    .AddComponentInteractions()
+    .AddDiscordGateway(options => options.Intents = 0);
 
 var host = builder.Build()
     .AddModules(typeof(Program).Assembly)

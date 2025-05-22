@@ -166,13 +166,13 @@ public sealed class DocsService(ILogger<DocsService> logger, IOptions<Configurat
                 if (symbol is INamespaceOrTypeSymbol namespaceOrType)
                 {
                     if (namespaceOrType is ITypeSymbol)
-                        symbols.Add(new(id, null, docsUrl));
+                        symbols.Add(new(id, null, SymbolFormatter.GetQualifiedName(symbol), docsUrl));
 
                     foreach (var child in namespaceOrType.GetMembers())
                         LoadMember(child, id);
                 }
                 else
-                    symbols.Add(new(id, parentId, docsUrl));
+                    symbols.Add(new(id, parentId, SymbolFormatter.GetQualifiedName(symbol), docsUrl));
             }
         }
 
